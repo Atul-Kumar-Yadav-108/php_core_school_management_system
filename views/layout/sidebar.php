@@ -31,6 +31,39 @@
                                                 echo "active";
                                             } ?>">Profile</a>
 
+    <a class="nav-link" data-bs-toggle="collapse" href="#mastersMenu" role="button">
+        Masters
+    </a>
+
+    <div class="collapse <?php echo in_array($page, ['subjects', 'classes', 'add_classes']) ? 'show' : ''; ?>" id="mastersMenu">
+
+        <ul class="list-unstyled ms-3">
+
+            <li>
+                <a href="index.php?page=subjects"
+                    class="<?php echo ($page == 'subjects') ? 'active' : ''; ?>">
+                    Subjects
+                </a>
+            </li>
+
+            <li>
+                <a href="index.php?page=classes"
+                    class="<?php echo ($page == 'classes' || $page == 'add_classes') ? 'active' : ''; ?>">
+                    Classes
+                </a>
+            </li>
+
+            <!-- <li>
+                <a href="index.php?page=topics"
+                    class="<?php echo ($page == 'topics') ? 'active' : ''; ?>">
+                    Topics
+                </a>
+            </li> -->
+
+        </ul>
+
+    </div>
+
     <hr>
 
     <a href="controllers/AuthController.php?action=logout" style="color:red;">Logout</a>

@@ -25,6 +25,10 @@ $allowed = [
     'profile',
     'add_teacher',
     'add_fees',
+    'subjects',
+    'add_subjects',
+    'classes',
+    'add_classes',
 ];
 
 /* security check */
@@ -77,6 +81,8 @@ $routes = [
     'profile' => 'views/profile/profile.php',
     'add_teacher' => 'views/teachers/add.php',
     'add_fees' => 'views/fees/add.php',
+    'add_classes' => 'views/class/add_class.php',
+    'classes' => 'views/class/class_list.php',
 ];
 
 include $routes[$page];

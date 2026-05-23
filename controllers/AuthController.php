@@ -16,6 +16,7 @@ if ($_POST['action'] == 'login') {
         // errorPrint($row);
         if (md5($password) == $row['password']) {
             $_SESSION['user'] = $email;
+            $_SESSION['user_name'] = $row['name'];
             $_SESSION['success'] = 'Login successful!';
             header("Location: ../index.php?page=dashboard");
         } else {
@@ -43,14 +44,9 @@ if ($action == 'logout') {
 
 if ($_POST['action'] == 'register') {
     $name = $_POST['name'];
-    $email = $_POST['email'];
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
     $hashedpassowrd = md5($password);
-    // echo "<pre>";
-    // print_r($_POST);
-    // print_r($hashedpassowrd);
-    // exit;
-
     $stmt = $con->prepare('Insert into tbl_users (name, email, password, original_password) VALUES(?,?,?,?)');
     $stmt->bind_param('ssss', $name, $email, $hashedpassowrd, $password);
     $stmt->execute();
