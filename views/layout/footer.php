@@ -2,7 +2,7 @@
 <?php
 if (isset($_SESSION['success'])) {
 ?>
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000" data-bs-autohide="true">
+    <div class="toast position-absolute bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000" data-bs-autohide="true">
         <div class="toast-body bg-success text-light fw-bold rounded text-center">
             <?php
             echo $_SESSION['success'];
@@ -18,7 +18,7 @@ if (isset($_SESSION['success'])) {
 <?php
 if (isset($_SESSION['error'])) {
 ?>
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000" data-bs-autohide="true">
+    <div class="toast position-absolute bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000" data-bs-autohide="true">
         <div class="toast-body bg-danger text-light fw-bold rounded text-center">
             <?php
             echo $_SESSION['error'];

@@ -8,7 +8,7 @@ if ($_POST['action'] == 'login') {
 
     if ($email == "admin@gmail.com" && $password == "1234") {
         $_SESSION['user'] = $email;
-
+        $_SESSION['success'] = 'Login successful!';
         header("Location: ../index.php?page=dashboard");
     } else {
         $_SESSION['error'] = 'Invalid login!';
