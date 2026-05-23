@@ -4,7 +4,7 @@
 
         <h3 class="text-center mb-4">Login</h3>
 
-        <form method="POST" action="controllers/AuthController.php">
+        <form method="POST" action="controllers/AuthController.php" id="loginForm">
 
             <input type="hidden" name="action" value="login">
 
@@ -31,3 +31,45 @@
     </div>
 
 </div>
+
+<script>
+    $(document).ready(function() {
+        $.validator.addMethod("noStartWithSpace", function(value, element) {
+            return this.optional(element) || value.charAt(0) !== ' ';
+        }, "Space not allowed at beginning!");
+        $('#loginForm').validate({
+
+            rules: {
+
+                email: {
+                    noStartWithSpace: true,
+                    required: true,
+                    email: true,
+                },
+
+                password: {
+                    required: true,
+                    minlength: 6,
+                    noStartWithSpace: true
+                }
+
+            },
+
+            messages: {
+
+                email: {
+                    required: "Email is required!",
+                    email: "Enter valid email!"
+                },
+
+                password: {
+                    required: "Password is required!",
+                    minlength: "Minimum 6 characters!"
+                }
+
+            }
+
+        });
+
+    });
+</script>
