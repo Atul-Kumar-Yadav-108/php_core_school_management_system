@@ -1,18 +1,29 @@
 <?php
+include('../helpers/helpers.php');
 session_start();
 include("../config/database.php");
 if ($_POST['action'] == 'login') {
 
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $stmt = $con->prepare('SELECT * FROM tbl_users where email = ?');
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $result  = $stmt->get_result();
 
-    if ($email == "admin@gmail.com" && $password == "1234") {
-        $_SESSION['user'] = $email;
-        $_SESSION['success'] = 'Login successful!';
-        header("Location: ../index.php?page=dashboard");
+    if ($result->num_rows > 0) {
+        $row  = $result->fetch_assoc();
+        // errorPrint($row);
+        if (md5($password) == $row['password']) {
+            $_SESSION['user'] = $email;
+            $_SESSION['success'] = 'Login successful!';
+            header("Location: ../index.php?page=dashboard");
+        } else {
+            $_SESSION['error'] = 'Wrong Password!';
+            header("Location: ../index.php?page=login");
+        }
     } else {
-        $_SESSION['error'] = 'Invalid login!';
-        // echo "Invalid Login";
+        $_SESSION['error'] = 'Not a registered user!';
         header("Location: ../index.php?page=login");
     }
     exit;
