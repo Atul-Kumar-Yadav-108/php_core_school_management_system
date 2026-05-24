@@ -30,7 +30,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'class_list') {
         foreach ($response['data'] as $row) {
 
             $srl++;
-
+            $statusBtn = $row['status'] == 1 ? 'Inactive' : 'Active';
             $tableData[] = [
 
                 "srl" => $srl,
@@ -47,6 +47,12 @@ if (isset($_POST['action']) && $_POST['action'] == 'class_list') {
                     : '<span class="badge bg-danger">Inactive</span>',
 
                 "action" => '
+                
+                <button class="btn btn-sm btn-warning statusBtn text-light"
+                    data-id="' . $row['id'] . '" data-table="tbl_classes_masters" data-status="' . $row['status'] . '">
+                    ' . $statusBtn . '
+                </button>
+
                 <a class="btn btn-sm btn-primary editBtn"
                     href="index.php?page=add_classes&id=' . $row['id'] . '">
                     Edit
@@ -76,5 +82,15 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_action') {
     $id = $_POST['id'];
     $table = $_POST['table'];
     delete($con, $id, $table); // no return
+    exit;
+}
+
+
+// global status change
+
+if (isset($_POST['action']) && $_POST['action'] == 'status_action') {
+    $id = $_POST['id'];
+    $table = $_POST['table'];
+    status($con, $id, $table); // no return
     exit;
 }
