@@ -92,4 +92,6 @@ include $routes[$page];
  FOOTER
 -----------------------------------
 */
+// Divyesh Patel
 include "views/layout/footer.php";
+
