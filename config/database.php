@@ -2,7 +2,7 @@
 
 $server = "localhost";
 $username = "root";
-$password = "";
+$password = "Divyesh@123";
 $database = "php_core_schoolmgt";
 $con = new mysqli($server, $username, $password, $database);
 
