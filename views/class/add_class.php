@@ -12,7 +12,7 @@ if (isset($_GET['id']) && $_GET['page'] == 'add_classes' && $_GET['id']) {
     }
 }
 ?>
-<h3 class="my-3">Add Class</h3>
+<h3 class="my-3"> <?php if (isset($_GET['id'])){echo "Update";}else{echo "Add";} ?> Class</h3>
 
 <div class="card p-4" style="max-width:600px;">
 

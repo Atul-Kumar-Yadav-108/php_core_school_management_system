@@ -17,6 +17,7 @@ if ($_POST['action'] == 'login') {
         if (md5($password) == $row['password']) {
             $_SESSION['user'] = $email;
             $_SESSION['user_name'] = $row['name'];
+            $_SESSION['user_id'] = $row['id'];
             $_SESSION['success'] = 'Login successful!';
             header("Location: ../index.php?page=dashboard");
         } else {
