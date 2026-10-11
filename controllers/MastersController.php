@@ -1,19 +1,18 @@
 <?php
-include('../helpers/helpers.php');
-session_start();
-include("../config/database.php");
+if (!defined('IS_API')) {
+    include('../helpers/helpers.php');
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    include("../config/database.php");
+}
+
 if ($_POST['action'] == 'add_class') {
-    // errorPrint($_POST);
-    // errorPrint($_SESSION['user_id']);
     $class_name = trim($_POST['class_name']);
     $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
 
     if ($id) {
-        // Edit: sirf doosre records mein same name check karo
         $stmt = $con->prepare('SELECT * FROM tbl_classes_masters WHERE class_name = ? AND id != ?');
         $stmt->bind_param('si', $class_name, $id);
     } else {
-        // Add: poori table mein check karo
         $stmt = $con->prepare('SELECT * FROM tbl_classes_masters WHERE class_name = ?');
         $stmt->bind_param('s', $class_name);
     }
@@ -21,8 +20,12 @@ if ($_POST['action'] == 'add_class') {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $_SESSION['error'] = 'Class name already exists!';
-        header("Location: ../index.php?page=add_classes");
+        if (defined('IS_API')) {
+            echo json_encode(['success' => false, 'message' => 'Class name already exists!']);
+        } else {
+            $_SESSION['error'] = 'Class name already exists!';
+            header("Location: ../index.php?page=add_classes");
+        }
     } else {
         if ($id) {
             $stmt_old = $con->prepare('SELECT class_name FROM tbl_classes_masters WHERE id = ?');
@@ -35,11 +38,19 @@ if ($_POST['action'] == 'add_class') {
             if ($stmt_addClass->execute()) {
                 $log_data = ['module' => 'classes', 'status' => 'updated', 'old_data' => $old_data, 'new_data' => $class_name];
                 set_log($_SESSION['user_id'], $log_data);
-                $_SESSION['success'] = 'Class updated successfully';
-                header("Location: ../index.php?page=classes");
+                if (defined('IS_API')) {
+                    echo json_encode(['success' => true, 'message' => 'Class updated successfully']);
+                } else {
+                    $_SESSION['success'] = 'Class updated successfully';
+                    header("Location: ../index.php?page=classes");
+                }
             } else {
-                $_SESSION['error'] = 'Error while updating class!';
-                header("Location: ../index.php?page=add_classes");
+                if (defined('IS_API')) {
+                    echo json_encode(['success' => false, 'message' => 'Error while updating class!']);
+                } else {
+                    $_SESSION['error'] = 'Error while updating class!';
+                    header("Location: ../index.php?page=add_classes");
+                }
             }
         } else {
             $created_on = date('Y-m-d H:i:s');
@@ -48,11 +59,19 @@ if ($_POST['action'] == 'add_class') {
             if ($stmt_addClass->execute()) {
                 $log_data = ['module' => 'classes', 'status' => 'added', 'old_data' => '', 'new_data' => $class_name];
                 set_log($_SESSION['user_id'], $log_data);
-                $_SESSION['success'] = 'Class added successfully';
-                header("Location: ../index.php?page=classes");
+                if (defined('IS_API')) {
+                    echo json_encode(['success' => true, 'message' => 'Class added successfully']);
+                } else {
+                    $_SESSION['success'] = 'Class added successfully';
+                    header("Location: ../index.php?page=classes");
+                }
             } else {
-                $_SESSION['error'] = 'Error while adding class!';
-                header("Location: ../index.php?page=add_classes");
+                if (defined('IS_API')) {
+                    echo json_encode(['success' => false, 'message' => 'Error while adding class!']);
+                } else {
+                    $_SESSION['error'] = 'Error while adding class!';
+                    header("Location: ../index.php?page=add_classes");
+                }
             }
         }
     }

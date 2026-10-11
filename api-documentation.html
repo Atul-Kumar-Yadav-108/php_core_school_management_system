@@ -1,0 +1,996 @@
+<title>School API Docs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+/* Layout: sticky sidebar + scrollable main content */
+:root {
+  --bg: #0f1117;
+  --surface: #161925;
+  --sidebar: #0b0d16;
+  --border: #242738;
+  --fg: #dce3f0;
+  --fg-muted: #6b7494;
+  --fg-dim: #3d4260;
+  --accent: #818cf8;
+  --accent-dim: rgba(129,140,248,.1);
+  --post-c: #60a5fa;
+  --post-bg: rgba(96,165,250,.1);
+  --get-c: #34d399;
+  --get-bg: rgba(52,211,153,.1);
+  --success: #4ade80;
+  --error: #f87171;
+  --code: #090b12;
+  --j-key: #93c5fd;
+  --j-str: #86efac;
+  --j-num: #fbbf24;
+  --j-bool: #c084fc;
+  --sidebar-w: 256px;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f1f3f8;
+    --surface: #ffffff;
+    --border: #e2e6f0;
+    --fg: #1a1f35;
+    --fg-muted: #5a6280;
+    --fg-dim: #aab0c8;
+    --accent: #6366f1;
+    --accent-dim: rgba(99,102,241,.08);
+    --post-c: #3b82f6;
+    --post-bg: rgba(59,130,246,.08);
+    --get-c: #059669;
+    --get-bg: rgba(5,150,105,.08);
+    --success: #16a34a;
+    --error: #dc2626;
+    --code: #1a1f35;
+    --j-key: #2563eb;
+    --j-str: #16a34a;
+    --j-num: #d97706;
+    --j-bool: #7c3aed;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f1f3f8;
+  --surface: #ffffff;
+  --border: #e2e6f0;
+  --fg: #1a1f35;
+  --fg-muted: #5a6280;
+  --fg-dim: #aab0c8;
+  --accent: #6366f1;
+  --accent-dim: rgba(99,102,241,.08);
+  --post-c: #3b82f6;
+  --post-bg: rgba(59,130,246,.08);
+  --get-c: #059669;
+  --get-bg: rgba(5,150,105,.08);
+  --success: #16a34a;
+  --error: #dc2626;
+  --code: #1a1f35;
+  --j-key: #2563eb;
+  --j-str: #16a34a;
+  --j-num: #d97706;
+  --j-bool: #7c3aed;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.layout { display: flex; min-height: 100vh }
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sb-head {
+  padding: 22px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.sb-logo {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sb-sub {
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-top: 3px;
+}
+
+.sb-nav { padding: 10px 0; flex: 1 }
+
+.nav-group { margin-bottom: 2px }
+
+.nav-group-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  transition: color .15s;
+}
+.nav-group-btn:hover { color: var(--fg) }
+
+.nav-chevron { margin-left: auto; font-size: 9px; transition: transform .2s; color: var(--fg-dim) }
+.nav-group.open .nav-chevron { transform: rotate(90deg) }
+
+.nav-items { display: none }
+.nav-group.open .nav-items { display: block }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 18px 7px 30px;
+  font-size: 12.5px;
+  color: rgba(220,227,240,.4);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  user-select: none;
+}
+.nav-item:hover { color: rgba(220,227,240,.8); background: rgba(255,255,255,.025) }
+.nav-item.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.m-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  padding: 2px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.m-post { background: var(--post-bg); color: var(--post-c) }
+.m-get  { background: var(--get-bg);  color: var(--get-c)  }
+
+/* ── Main ── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-y: auto }
+
+.main-hero {
+  padding: 36px 44px 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.main-hero h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.025em;
+}
+
+.main-hero p {
+  font-size: 13.5px;
+  color: var(--fg-muted);
+  margin-top: 8px;
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 20px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-chip {
+  font-size: 12px;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-chip strong { color: var(--fg); font-weight: 500 }
+
+/* Welcome panel */
+.welcome-panel {
+  padding: 44px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-inner {
+  text-align: center;
+  max-width: 360px;
+}
+
+.welcome-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  opacity: .4;
+}
+
+.welcome-inner h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--fg-muted);
+}
+
+.welcome-inner p {
+  font-size: 13px;
+  color: var(--fg-dim);
+  line-height: 1.6;
+}
+
+/* ── Endpoint panel ── */
+.content { padding: 0 44px 56px }
+
+.ep-panel { display: none; padding-top: 36px }
+.ep-panel.active { display: block }
+
+.ep-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.ep-method {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 5px;
+}
+.ep-method.post { background: var(--post-bg); color: var(--post-c) }
+.ep-method.get  { background: var(--get-bg);  color: var(--get-c)  }
+
+.ep-name { font-size: 20px; font-weight: 700; letter-spacing: -.02em }
+
+.ep-desc {
+  font-size: 13.5px;
+  color: var(--fg-muted);
+  line-height: 1.65;
+  margin-bottom: 28px;
+  max-width: 560px;
+}
+
+/* Info grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.info-cell { background: var(--surface); padding: 14px 18px }
+
+.info-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 6px;
+}
+
+.info-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  color: var(--fg);
+  word-break: break-all;
+}
+
+/* Section label */
+.sec-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 12px;
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Params table */
+.params-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.params-table th {
+  background: rgba(255,255,255,.025);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.params-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.params-table tr:last-child td { border-bottom: none }
+
+.p-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+}
+.tag-req { background: rgba(248,113,113,.1); color: var(--error) }
+.tag-opt { background: rgba(107,114,128,.1); color: var(--fg-muted) }
+.tag-cond { background: rgba(251,191,36,.1); color: #fbbf24 }
+
+/* Code block */
+.code-block {
+  background: var(--code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.code-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+}
+
+.code-title { font-size: 12px; font-weight: 500; color: var(--fg-muted) }
+
+.copy-btn {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent) }
+.copy-btn.ok { border-color: var(--success); color: var(--success) }
+
+.code-body {
+  padding: 16px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.75;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.j-key  { color: var(--j-key) }
+.j-str  { color: var(--j-str) }
+.j-num  { color: var(--j-num) }
+.j-bool { color: var(--j-bool) }
+.j-null { color: var(--fg-muted) }
+.j-p    { color: var(--fg-muted) }
+
+/* ── Stats footer ── */
+.stats-footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 44px 44px;
+  background: var(--surface);
+}
+
+.stats-header {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.stats-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.count-chips { display: flex; gap: 10px; flex-wrap: wrap }
+
+.count-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--fg-muted);
+  background: var(--bg);
+}
+
+.count-chip span {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.stats-table th {
+  background: rgba(255,255,255,.025);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.stats-table tr:last-child td { border-bottom: none }
+.stats-table tr:hover td { background: rgba(255,255,255,.015) }
+
+.st-module {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--fg-muted);
+  letter-spacing: .04em;
+}
+
+.st-name { font-weight: 500 }
+
+.st-uri {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--fg-muted);
+}
+
+.st-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.st-live { background: rgba(74,222,128,.1); color: var(--success) }
+.st-planned { background: rgba(107,114,128,.1); color: var(--fg-muted) }
+
+/* Responsive */
+@media (max-width: 720px) {
+  .sidebar { width: 100%; height: auto; position: static }
+  .layout { flex-direction: column }
+  .main-hero, .content, .stats-footer { padding-left: 20px; padding-right: 20px }
+  .main-hero { padding-top: 24px }
+  .info-grid { grid-template-columns: 1fr 1fr }
+  .welcome-panel { padding: 32px 20px }
+}
+</style>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">School API</div>
+      <div class="sb-sub">v1.0 &nbsp;·&nbsp; Base: <code style="font-family:'JetBrains Mono',monospace;font-size:10px">/api/index.php</code></div>
+    </div>
+
+    <nav class="sb-nav">
+
+      <div class="nav-group open" id="grp-masters">
+        <button class="nav-group-btn" onclick="toggleGroup('grp-masters')">
+          Masters
+          <span class="nav-chevron">▶</span>
+        </button>
+        <div class="nav-items">
+          <div class="nav-item active" onclick="show('add-class', this)">
+            <span class="m-badge m-post">POST</span>
+            Add Class
+          </div>
+          <div class="nav-item" onclick="show('class-list', this)">
+            <span class="m-badge m-get">GET</span>
+            Class List
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-group open" id="grp-student">
+        <button class="nav-group-btn" onclick="toggleGroup('grp-student')">
+          Student
+          <span class="nav-chevron">▶</span>
+        </button>
+        <div class="nav-items">
+          <div class="nav-item" onclick="show('add-student', this)">
+            <span class="m-badge m-post">POST</span>
+            Add Student
+          </div>
+          <div class="nav-item" onclick="show('student-list', this)">
+            <span class="m-badge m-get">GET</span>
+            Student List
+          </div>
+        </div>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="main-hero">
+      <h1>API Reference</h1>
+      <p>School Management System REST API. All endpoints accept <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">application/x-www-form-urlencoded</code> and return JSON.</p>
+      <div class="hero-meta">
+        <div class="hero-chip">Base URL <strong>/api/index.php</strong></div>
+        <div class="hero-chip">Auth <strong>Session based</strong></div>
+        <div class="hero-chip">Format <strong>JSON</strong></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── ADD CLASS ── -->
+      <div class="ep-panel active" id="ep-add-class">
+        <div class="ep-title-row">
+          <span class="ep-method post">POST</span>
+          <span class="ep-name">Add / Update Class</span>
+        </div>
+        <p class="ep-desc">Create a new class or update an existing one. Duplicate class names are rejected. Pass <code style="font-family:'JetBrains Mono',monospace;font-size:12px">id</code> to update; omit it (or send <code style="font-family:'JetBrains Mono',monospace;font-size:12px">id=</code>) to insert.</p>
+
+        <div class="info-grid">
+          <div class="info-cell">
+            <div class="info-label">Method</div>
+            <div class="info-val">POST</div>
+          </div>
+          <div class="info-cell">
+            <div class="info-label">URI</div>
+            <div class="info-val">/api/index.php</div>
+          </div>
+          <div class="info-cell">
+            <div class="info-label">Content-Type</div>
+            <div class="info-val">application/x-www-form-urlencoded</div>
+          </div>
+          <div class="info-cell">
+            <div class="info-label">Auth</div>
+            <div class="info-val">Session required</div>
+          </div>
+        </div>
+
+        <div class="sec-label">Request Parameters</div>
+        <table class="params-table" style="margin-bottom:28px">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Required</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="p-name">action</span></td>
+              <td>string</td>
+              <td><span class="tag tag-req">required</span></td>
+              <td>Must be <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px">add_class</code></td>
+            </tr>
+            <tr>
+              <td><span class="p-name">class_name</span></td>
+              <td>string</td>
+              <td><span class="tag tag-req">required</span></td>
+              <td>Name of the class. Must be unique across all classes.</td>
+            </tr>
+            <tr>
+              <td><span class="p-name">id</span></td>
+              <td>integer</td>
+              <td><span class="tag tag-cond">conditional</span></td>
+              <td>Class ID for update. Omit or leave empty to create a new record.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sec-label">Example Request</div>
+        <div class="code-block" style="margin-bottom:28px">
+          <div class="code-hd">
+            <span class="code-title">POST body — Add</span>
+            <button class="copy-btn" onclick="copyText('action=add_class&class_name=10th+Standard&id=', this)">Copy</button>
+          </div>
+          <div class="code-body">action=add_class&class_name=10th+Standard&id=</div>
+        </div>
+
+        <div class="code-block" style="margin-bottom:28px">
+          <div class="code-hd">
+            <span class="code-title">POST body — Update (id=3)</span>
+            <button class="copy-btn" onclick="copyText('action=add_class&class_name=10th+Standard&id=3', this)">Copy</button>
+          </div>
+          <div class="code-body">action=add_class&class_name=10th+Standard&id=3</div>
+        </div>
+
+        <div class="sec-label">Success Response</div>
+        <div class="code-block" style="margin-bottom:28px">
+          <div class="code-hd">
+            <span class="code-title">200 OK — Created</span>
+          </div>
+          <div class="code-body"><span class="j-p">{</span>
+  <span class="j-key">"success"</span><span class="j-p">:</span> <span class="j-bool">true</span><span class="j-p">,</span>
+  <span class="j-key">"message"</span><span class="j-p">:</span> <span class="j-str">"Class added successfully"</span>
+<span class="j-p">}</span></div>
+        </div>
+
+        <div class="code-block" style="margin-bottom:28px">
+          <div class="code-hd">
+            <span class="code-title">200 OK — Updated</span>
+          </div>
+          <div class="code-body"><span class="j-p">{</span>
+  <span class="j-key">"success"</span><span class="j-p">:</span> <span class="j-bool">true</span><span class="j-p">,</span>
+  <span class="j-key">"message"</span><span class="j-p">:</span> <span class="j-str">"Class updated successfully"</span>
+<span class="j-p">}</span></div>
+        </div>
+
+        <div class="sec-label">Error Responses</div>
+        <div class="code-block" style="margin-bottom:12px">
+          <div class="code-hd">
+            <span class="code-title">Duplicate name</span>
+          </div>
+          <div class="code-body"><span class="j-p">{</span>
+  <span class="j-key">"success"</span><span class="j-p">:</span> <span class="j-bool">false</span><span class="j-p">,</span>
+  <span class="j-key">"message"</span><span class="j-p">:</span> <span class="j-str">"Class name already exists!"</span>
+<span class="j-p">}</span></div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-hd">
+            <span class="code-title">DB error</span>
+          </div>
+          <div class="code-body"><span class="j-p">{</span>
+  <span class="j-key">"success"</span><span class="j-p">:</span> <span class="j-bool">false</span><span class="j-p">,</span>
+  <span class="j-key">"message"</span><span class="j-p">:</span> <span class="j-str">"Error while adding class!"</span>
+<span class="j-p">}</span></div>
+        </div>
+      </div>
+
+      <!-- ── CLASS LIST ── -->
+      <div class="ep-panel" id="ep-class-list">
+        <div class="ep-title-row">
+          <span class="ep-method get">GET</span>
+          <span class="ep-name">Class List</span>
+        </div>
+        <p class="ep-desc">Returns all active classes from the system, ordered by name.</p>
+
+        <div class="info-grid">
+          <div class="info-cell"><div class="info-label">Method</div><div class="info-val">GET</div></div>
+          <div class="info-cell"><div class="info-label">URI</div><div class="info-val">/api/index.php?action=get_classes</div></div>
+          <div class="info-cell"><div class="info-label">Auth</div><div class="info-val">Session required</div></div>
+          <div class="info-cell"><div class="info-label">Status</div><div class="info-val" style="color:#fbbf24">Planned</div></div>
+        </div>
+
+        <div class="sec-label">Example Request</div>
+        <div class="code-block" style="margin-bottom:28px">
+          <div class="code-hd">
+            <span class="code-title">GET</span>
+            <button class="copy-btn" onclick="copyText('/api/index.php?action=get_classes', this)">Copy</button>
+          </div>
+          <div class="code-body">GET /api/index.php?action=get_classes</div>
+        </div>
+
+        <div class="sec-label">Success Response</div>
+        <div class="code-block">
+          <div class="code-hd"><span class="code-title">200 OK</span></div>
+          <div class="code-body"><span class="j-p">{</span>
+  <span class="j-key">"success"</span><span class="j-p">:</span> <span class="j-bool">true</span><span class="j-p">,</span>
+  <span class="j-key">"data"</span><span class="j-p">: [</span>
+    <span class="j-p">{</span>
+      <span class="j-key">"id"</span><span class="j-p">:</span>         <span class="j-num">1</span><span class="j-p">,</span>
+      <span class="j-key">"class_name"</span><span class="j-p">:</span> <span class="j-str">"1st"</span><span class="j-p">,</span>
+      <span class="j-key">"status"</span><span class="j-p">:</span>     <span class="j-num">1</span><span class="j-p">,</span>
+      <span class="j-key">"created_on"</span><span class="j-p">:</span> <span class="j-str">"2026-10-11 15:33:11"</span>
+    <span class="j-p">}</span>
+  <span class="j-p">]</span>
+<span class="j-p">}</span></div>
+        </div>
+      </div>
+
+      <!-- ── ADD STUDENT ── -->
+      <div class="ep-panel" id="ep-add-student">
+        <div class="ep-title-row">
+          <span class="ep-method post">POST</span>
+          <span class="ep-name">Add / Update Student</span>
+        </div>
+        <p class="ep-desc">Enroll a new student or update an existing student record. Pass <code style="font-family:'JetBrains Mono',monospace;font-size:12px">id</code> to update.</p>
+
+        <div class="info-grid">
+          <div class="info-cell"><div class="info-label">Method</div><div class="info-val">POST</div></div>
+          <div class="info-cell"><div class="info-label">URI</div><div class="info-val">/api/index.php</div></div>
+          <div class="info-cell"><div class="info-label">Auth</div><div class="info-val">Session required</div></div>
+          <div class="info-cell"><div class="info-label">Status</div><div class="info-val" style="color:#fbbf24">Planned</div></div>
+        </div>
+
+        <div class="sec-label">Request Parameters</div>
+        <table class="params-table" style="margin-bottom:28px">
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="p-name">action</span></td>
+              <td>string</td>
+              <td><span class="tag tag-req">required</span></td>
+              <td>Must be <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px">add_student</code></td>
+            </tr>
+            <tr>
+              <td><span class="p-name">first_name</span></td>
+              <td>string</td>
+              <td><span class="tag tag-req">required</span></td>
+              <td>Student's first name.</td>
+            </tr>
+            <tr>
+              <td><span class="p-name">last_name</span></td>
+              <td>string</td>
+              <td><span class="tag tag-req">required</span></td>
+              <td>Student's last name.</td>
+            </tr>
+            <tr>
+              <td><span class="p-name">class_id</span></td>
+              <td>integer</td>
+              <td><span class="tag tag-req">required</span></td>
+              <td>ID of the class to enroll the student in.</td>
+            </tr>
+            <tr>
+              <td><span class="p-name">roll_no</span></td>
+              <td>string</td>
+              <td><span class="tag tag-opt">optional</span></td>
+              <td>Roll number within the class.</td>
+            </tr>
+            <tr>
+              <td><span class="p-name">id</span></td>
+              <td>integer</td>
+              <td><span class="tag tag-cond">conditional</span></td>
+              <td>Student ID — provide to update an existing record.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sec-label">Success Response</div>
+        <div class="code-block">
+          <div class="code-hd"><span class="code-title">200 OK</span></div>
+          <div class="code-body"><span class="j-p">{</span>
+  <span class="j-key">"success"</span><span class="j-p">:</span> <span class="j-bool">true</span><span class="j-p">,</span>
+  <span class="j-key">"message"</span><span class="j-p">:</span> <span class="j-str">"Student added successfully"</span>
+<span class="j-p">}</span></div>
+        </div>
+      </div>
+
+      <!-- ── STUDENT LIST ── -->
+      <div class="ep-panel" id="ep-student-list">
+        <div class="ep-title-row">
+          <span class="ep-method get">GET</span>
+          <span class="ep-name">Student List</span>
+        </div>
+        <p class="ep-desc">Returns all students, optionally filtered by class.</p>
+
+        <div class="info-grid">
+          <div class="info-cell"><div class="info-label">Method</div><div class="info-val">GET</div></div>
+          <div class="info-cell"><div class="info-label">URI</div><div class="info-val">/api/index.php?action=get_students</div></div>
+          <div class="info-cell"><div class="info-label">Auth</div><div class="info-val">Session required</div></div>
+          <div class="info-cell"><div class="info-label">Status</div><div class="info-val" style="color:#fbbf24">Planned</div></div>
+        </div>
+
+        <div class="sec-label">Query Parameters</div>
+        <table class="params-table" style="margin-bottom:28px">
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="p-name">action</span></td>
+              <td>string</td>
+              <td><span class="tag tag-req">required</span></td>
+              <td>Must be <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px">get_students</code></td>
+            </tr>
+            <tr>
+              <td><span class="p-name">class_id</span></td>
+              <td>integer</td>
+              <td><span class="tag tag-opt">optional</span></td>
+              <td>Filter students by class ID.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sec-label">Success Response</div>
+        <div class="code-block">
+          <div class="code-hd"><span class="code-title">200 OK</span></div>
+          <div class="code-body"><span class="j-p">{</span>
+  <span class="j-key">"success"</span><span class="j-p">:</span> <span class="j-bool">true</span><span class="j-p">,</span>
+  <span class="j-key">"data"</span><span class="j-p">: [</span>
+    <span class="j-p">{</span>
+      <span class="j-key">"id"</span><span class="j-p">:</span>         <span class="j-num">1</span><span class="j-p">,</span>
+      <span class="j-key">"first_name"</span><span class="j-p">:</span> <span class="j-str">"Aman"</span><span class="j-p">,</span>
+      <span class="j-key">"last_name"</span><span class="j-p">:</span>  <span class="j-str">"Sharma"</span><span class="j-p">,</span>
+      <span class="j-key">"class_id"</span><span class="j-p">:</span>   <span class="j-num">1</span><span class="j-p">,</span>
+      <span class="j-key">"roll_no"</span><span class="j-p">:</span>    <span class="j-str">"01"</span>
+    <span class="j-p">}</span>
+  <span class="j-p">]</span>
+<span class="j-p">}</span></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- ── STATS FOOTER ── -->
+    <div class="stats-footer">
+      <div class="stats-header">
+        <span class="stats-title">All Endpoints</span>
+        <div class="count-chips">
+          <div class="count-chip"><span>4</span> Total APIs</div>
+          <div class="count-chip"><span>1</span> Live</div>
+          <div class="count-chip"><span>3</span> Planned</div>
+        </div>
+      </div>
+
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Module</th>
+            <th>API Name</th>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--fg-muted);font-variant-numeric:tabular-nums">01</td>
+            <td><span class="st-module">Masters</span></td>
+            <td><span class="st-name" style="cursor:pointer;color:var(--accent)" onclick="show('add-class', document.querySelector('.nav-item'))">Add / Update Class</span></td>
+            <td><span class="m-badge m-post">POST</span></td>
+            <td><span class="st-uri">/api/index.php</span></td>
+            <td><span class="st-status st-live">● Live</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--fg-muted);font-variant-numeric:tabular-nums">02</td>
+            <td><span class="st-module">Masters</span></td>
+            <td><span class="st-name">Class List</span></td>
+            <td><span class="m-badge m-get">GET</span></td>
+            <td><span class="st-uri">/api/index.php?action=get_classes</span></td>
+            <td><span class="st-status st-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--fg-muted);font-variant-numeric:tabular-nums">03</td>
+            <td><span class="st-module">Student</span></td>
+            <td><span class="st-name">Add / Update Student</span></td>
+            <td><span class="m-badge m-post">POST</span></td>
+            <td><span class="st-uri">/api/index.php</span></td>
+            <td><span class="st-status st-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--fg-muted);font-variant-numeric:tabular-nums">04</td>
+            <td><span class="st-module">Student</span></td>
+            <td><span class="st-name">Student List</span></td>
+            <td><span class="m-badge m-get">GET</span></td>
+            <td><span class="st-uri">/api/index.php?action=get_students</span></td>
+            <td><span class="st-status st-planned">○ Planned</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /main -->
+</div>
+
+<script>
+const panels = {
+  'add-class':    'ep-add-class',
+  'class-list':   'ep-class-list',
+  'add-student':  'ep-add-student',
+  'student-list': 'ep-student-list'
+};
+
+function show(key, navEl) {
+  // Hide all panels
+  Object.values(panels).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  // Show target
+  const target = document.getElementById(panels[key]);
+  if (target) target.classList.add('active');
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  if (navEl && navEl.classList) navEl.classList.add('active');
+}
+
+function toggleGroup(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok') }, 1800);
+  }).catch(() => {
+    btn.textContent = 'Failed';
+    setTimeout(() => { btn.textContent = 'Copy' }, 1800);
+  });
+}
+</script>
